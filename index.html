@@ -1,9 +1,13 @@
+<head>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
 <h1>
 Create your dreamy wallpaper 
 </h1>
 
 <canvas id="myCanvas" width="800" height="600"></canvas> 
-<div> <input type="color" id="bgColor1" value="#800080">
+<div> <input type="color" id="bgColor1" value="#A0C0A0">
  <input type="color" id="bgColor2" value="#ff69b4"> 
 
 <button onclick="updateCanvas()">Update Colors</button> 
@@ -50,6 +54,12 @@ Example 3:
 Example 4:
 </pre>
 <img id="preview4" src="dreamy_wallpaper-4.png" alt="Canvas Preview" />
+
+<footer>
+<p>© 2025 JoJo Janice Dreamy wallpaper</p>
+    </footer>
+
+</body>
  <script> const canvas = document.getElementById('myCanvas'); 
 const ctx = canvas.getContext('2d'); let animationFrameId; 
 let lineX = 0; let speed = 5; let isAnimating = true; let time = 0; 
