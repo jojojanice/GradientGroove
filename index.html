@@ -1,0 +1,107 @@
+<h1>
+Create your dreamy wallpaper 
+</h1>
+
+<canvas id="myCanvas" width="800" height="600"></canvas> 
+<div> <input type="color" id="bgColor1" value="#800080">
+ <input type="color" id="bgColor2" value="#ff69b4"> 
+
+<button onclick="updateCanvas()">Update Colors</button> 
+<button onclick="downloadImage()">Download Wallpaper</button> 
+<button onclick="toggleAnimation()">Toggle Animation</button> 
+</div>
+<pre>
+
+
+
+
+</pre>
+<pre>
+Example 1:
+</pre>
+<img id="preview" src="dreamy_wallpaper-2.png" alt="Canvas Preview" />
+<pre>
+
+
+
+
+</pre>
+<pre>
+Example 2:
+</pre>
+<img id="preview2" src="dreamy_wallpaper.png" alt="Canvas Preview" />
+<pre>
+
+
+
+
+</pre>
+<pre>
+Example 3:
+</pre>
+<img id="preview3" src="dreamy_wallpaper-3.png" alt="Canvas Preview" />
+<pre>
+
+
+
+
+</pre>
+<pre>
+Example 4:
+</pre>
+<img id="preview4" src="dreamy_wallpaper-4.png" alt="Canvas Preview" />
+ <script> const canvas = document.getElementById('myCanvas'); 
+const ctx = canvas.getContext('2d'); let animationFrameId; 
+let lineX = 0; let speed = 5; let isAnimating = true; let time = 0; 
+
+function drawDreamyBackground(bgColor1 = '#800080', bgColor2 = '#ff69b4') 
+{ const gradient = ctx.createLinearGradient(0, 0, 0, 600); gradient.addColorStop(0, bgColor1); gradient.addColorStop(1, bgColor2); ctx.fillStyle = gradient; ctx.fillRect(0, 0, canvas.width, canvas.height); // Add dreamy wave effect 
+
+ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'; 
+for (let i = 0; i < 3; i++) 
+{ ctx.beginPath(); 
+let yOffset = Math.sin(time + i) * 20; 
+ctx.moveTo(0, 80 * i + yOffset); 
+for (let x = 0; x <= canvas.width; x += 10) 
+{ let y = 80 * i + Math.sin(x / 100 + time + i) * 50;
+ ctx.lineTo(x, y + yOffset); } 
+
+ctx.lineTo(canvas.width, canvas.height); 
+ctx.lineTo(0, canvas.height); 
+ctx.closePath(); ctx.fill(); } } 
+function drawGradientLine(lineColor1 = '#ffff00', lineColor2 = '#800080') 
+{ 
+//const gradient = ctx.createLinearGradient(lineX, 0, lineX + 100, 100); //gradient.addColorStop(0, lineColor1); gradient.addColorStop(1, lineColor2); 
+//ctx.strokeStyle = gradient; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(lineX, 0); ctx.lineTo(lineX + 100, 600); ctx.stroke(); ctx.closePath();
+ } 
+function animate() 
+{ 
+if (!isAnimating) return;
+ ctx.clearRect(0, 0, canvas.width, canvas.height); time += 0.05; 
+// Slow wave animation 
+
+drawDreamyBackground( document.getElementById('bgColor1').value, document.getElementById('bgColor2').value ); 
+
+//drawGradientLine( 
+//document.getElementById('lineColor1').value, document.getElementById('lineColor2').value ); 
+
+lineX += speed; 
+if (lineX > canvas.width) lineX = -100; 
+// Loop line back 
+animationFrameId = requestAnimationFrame(animate); 
+} 
+function updateCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); drawDreamyBackground( document.getElementById('bgColor1').value, document.getElementById('bgColor2').value );
+// drawGradientLine( document.getElementById('lineColor1').value, document.getElementById('lineColor2').value ); 
+} 
+function downloadImage() 
+{ const link = document.createElement('a'); 
+link.href = canvas.toDataURL('image/png'); 
+link.download = 'dreamy_wallpaper.png'; 
+link.click(); } 
+function toggleAnimation() { isAnimating = !isAnimating; 
+if (isAnimating) { animate(); } else { cancelAnimationFrame(animationFrameId); 
+updateCanvas(); } } 
+// Start the animation 
+drawDreamyBackground(); 
+//drawGradientLine();
+ animate(); </script>
