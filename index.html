@@ -2,6 +2,17 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+ <script>
+function isMobileDevice() {
+  const isSmallScreen = window.innerWidth <= 767;
+  const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  return isSmallScreen || isMobileUserAgent;
+}
+
+if (isMobileDevice()) {
+  window.location.href = 'index-4.html';
+}
+</script>
 <h1>
 Create your dreamy wallpaper 
 </h1>
