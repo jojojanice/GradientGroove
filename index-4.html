@@ -1,0 +1,247 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradient Groove</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #800080, #FFFF00);
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      background: #fff;
+      max-width: 100%;
+      width: 90vw;
+      height: calc(90vw * 1.5); /* 保持 2:3 比例，適合手機 */
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    input[type="color"] {
+      width: 50px;
+      height: 50px;
+      padding: 2px;
+      border: none;
+      cursor: pointer;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background: #800080;
+      color: #fff;
+      border-radius: 5px;
+      touch-action: manipulation; /* 改善觸控體驗 */
+    }
+    button:hover {
+      background: #6a006a;
+    }
+    #preview {
+      max-width: 90vw;
+      width: 400px;
+      margin-top: 20px;
+    }
+    @media (max-width: 600px) {
+      canvas {
+        width: 95vw;
+        height: calc(95vw * 1.777); /* 9:16 比例，適合手機 */
+      }
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      input[type="color"] {
+        width: 60px;
+        height: 60px;
+      }
+      button {
+        width: 100%;
+        max-width: 200px;
+        padding: 12px;
+        font-size: 18px;
+      }
+      #preview {
+        width: 80vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas"></canvas>
+  <div class="controls">
+    <input type="color" id="bgColor1" value="#800080" title="背景起始色 (紫羅蘭)">
+    <input type="color" id="bgColor2" value="#FFB6C1" title="背景結束色 (淡粉紅)">
+    
+    <button onclick="updateCanvas()">更新顏色</button>
+    <button onclick="downloadImage()">下載壁紙</button>
+    <button onclick="toggleAnimation()">開關動畫</button>
+  </div>
+  <img id="preview" src="" alt="畫布預覽" />
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    const preview = document.getElementById('preview');
+    let animationFrameId;
+    let lineX = 0;
+    let speed = 5;
+    let isAnimating = true;
+    let time = 0;
+
+    // 動態設置 canvas 大小
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth * 0.9;
+      const height = width * (window.innerWidth <= 600 ? 1.777 : 1.5);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.scale(dpr, dpr);
+    }
+
+    function drawDreamyBackground(bgColor1 = '#800080', bgColor2 = '#FFB6C1') {
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height / (window.devicePixelRatio || 1));
+      gradient.addColorStop(0, bgColor1);
+      gradient.addColorStop(1, bgColor2);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+      // 夢幻波浪效果
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        let yOffset = Math.sin(time + i) * 20;
+        ctx.moveTo(0, (canvas.height / (window.devicePixelRatio || 1) / 6) * i + yOffset);
+        for (let x = 0; x <= canvas.width / (window.devicePixelRatio || 1); x += 10) {
+          let y = (canvas.height / (window.devicePixelRatio || 1) / 6) * i + Math.sin(x / 100 + time + i) * 50;
+          ctx.lineTo(x, y + yOffset);
+        }
+        ctx.lineTo(canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+        ctx.lineTo(0, canvas.height / (window.devicePixelRatio || 1));
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    // function drawGradientLine(lineColor1 = '#FFFF00', lineColor2 = '#800080') {
+    //   const gradient = ctx.createLinearGradient(lineX, 0, lineX + 100, 100);
+    //   gradient.addColorStop(0, lineColor1);
+    //   gradient.addColorStop(1, lineColor2);
+    //   ctx.strokeStyle = gradient;
+    //   ctx.lineWidth = 10;
+    //   ctx.beginPath();
+    //   ctx.moveTo(lineX, 0);
+    //   ctx.lineTo(lineX + 100, canvas.height / (window.devicePixelRatio || 1));
+    //   ctx.stroke();
+    //   ctx.closePath();
+    // }
+
+    function updatePreview() {
+      preview.src = canvas.toDataURL('image/png');
+    }
+
+    function animate() {
+      if (!isAnimating) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      time += 0.05;
+      drawDreamyBackground(
+        document.getElementById('bgColor1').value,
+        document.getElementById('bgColor2').value
+      );
+      
+      lineX += speed;
+      if (lineX > canvas.width / (window.devicePixelRatio || 1)) lineX = -100;
+      updatePreview();
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    function updateCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawDreamyBackground(
+        document.getElementById('bgColor1').value,
+        document.getElementById('bgColor2').value
+      );
+      
+      updatePreview();
+    }
+
+    function downloadImage() {
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'dreamy_wallpaper.png';
+      link.click();
+    }
+
+    function toggleAnimation() {
+      isAnimating = !isAnimating;
+      if (isAnimating) {
+        animate();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+        updateCanvas();
+      }
+    }
+
+    // 初始化 canvas 大小並監聽窗口調整
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // 初始繪製和預覽
+    drawDreamyBackground();
+    //drawGradientLine();
+    updatePreview();
+    animate();
+  </script>
+</body>
+</html>
