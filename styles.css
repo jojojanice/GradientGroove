@@ -28,14 +28,15 @@ canvas {
 /* 響應式設計：平板和手機 */
         @media (max-width: 768px) {
             canvas {
-                width: 100%;
-                max-width: 400px;
+                width: 400px;
+                height: 600px;
             }
 	}
 /* 小螢幕（手機） */
         @media (max-width: 480px) {
             canvas {
-                max-width: 300px;
+                width: 300px;
+                height: 500px;
             }
  	}
 h2 {
