@@ -19,6 +19,25 @@ h1 {
     text-shadow: 0 0 10px #fff, 0 0 20px #ffcc00;
 }
 
+canvas {
+            border: 2px solid #333;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+        }
+/* 響應式設計：平板和手機 */
+        @media (max-width: 768px) {
+            canvas {
+                width: 100%;
+                max-width: 400px;
+            }
+	}
+/* 小螢幕（手機） */
+        @media (max-width: 480px) {
+            canvas {
+                max-width: 300px;
+            }
+ 	}
 h2 {
     margin: 30px 0;
     font-size: 2rem;
