@@ -1,0 +1,39 @@
+TOK BROWSER Privacy Policy
+
+Effective Date: August 20, 2025
+
+Thank you for choosing to use TOK BROWSER (hereinafter referred to as “the App”). We are committed to protecting your privacy and ensuring you feel confident in your experience with the App. This Privacy Policy explains how we handle data related to the App and your privacy choices when using it. The App is developed and operated by Janice Chang (hereinafter referred to as “we” or “us”).
+
+1. We Do Not Collect or Access Personal Data
+At this time, the App does not actively collect, store, or process any personal data (such as your name, email address, location, contacts, or other personally identifiable information). We do not use artificial intelligence or other technologies to analyze or process user data, so your personal information is not accessed or used by the App.
+
+2. In-App Purchases (Apple StoreKit)
+The App may offer in-app purchases through Apple’s StoreKit. All transactions related to in-app purchases are processed by Apple and are subject to Apple’s Privacy Policy. We do not directly collect or store any personal information related to purchases (such as payment details). Apple may collect data related to transactions, such as transaction IDs or payment information, and the handling of such data is governed by Apple’s Privacy Policy:
+
+- Apple Privacy Policy
+
+Please note that when you make purchases through Apple StoreKit, Apple may require you to provide certain information (e.g., Apple ID or payment details). This information is managed directly by Apple, and we do not have access to it.
+
+3. Browser Features and Third-Party Websites
+The App may include links to third-party websites or services (e.g., Apple, Google, or Yahoo websites) to provide necessary information or functionality. When you click these links and visit third-party websites, their respective privacy policies will apply. We do not control the data collection or processing practices of these third-party websites, so we recommend reviewing their privacy policies before accessing them:
+
+- Google Privacy Policy
+- Yahoo Privacy Policy
+- Apple Privacy Policy
+
+The App does not collect or store any personal data from these third-party websites.
+
+4. Data Security
+Since the App currently does not collect or store personal data, no additional data security measures are required. If the App begins collecting or processing data in the future, we will implement appropriate technical and organizational measures to ensure the security of your data and update this Privacy Policy to reflect those changes.
+
+5. Privacy Controls and Choices
+As the App does not collect personal data, you do not need to adjust any privacy settings to use it. If you have questions about the privacy practices of in-app purchases or third-party websites, please refer to the respective platform’s privacy policy and contact them directly.
+
+6. Changes to This Privacy Policy
+We may update this Privacy Policy from time to time to reflect changes in the App’s functionality or legal requirements. If significant changes are made, we will notify you through in-app notifications or by updating this policy page. Please review this policy periodically to stay informed of any updates.
+
+7. Contact Us
+If you have any questions about this Privacy Policy or the App’s privacy practices, please contact us at:
+
+- Email: janicechang.taiwan@gmail.com
+- Website: www.merobot.net ( ME Robot)
