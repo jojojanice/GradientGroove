@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Preload the video file to start fetching it early -->
+    <link rel="preload" href="Tok%20Browser%20Ad%20-%20SD%20480p.mov" as="video" type="video/mov">
     <title>Small Ball Adventure. ME Robot</title>
     <style>
         body {
@@ -33,7 +35,12 @@
 <body>
     <div class="app-container">
         <h1>ME Robot</h1>
+         <video controls>
+    <source src="/videos/sample-video.mp4" type="video/mp4">
+    loading...
+  
         <img src="merobot.png" alt="connect to Me Robot">
+             </video>
         <p>email: janicechang.taiwan@gmail.com</p>
     </div>
 </body>
