@@ -4,15 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Preload the video file to start fetching it early -->
-    <link rel="preload" href="Tok_Browser_Ad_SD_480p.mov" as="video" type="video/quicktime">
+    <link rel="preload" href="Tok_Browser_Ad_SD_480p.mp4" as="video" type="video/mp4">
     <title>Small Ball Adventure. ME Robot</title>
     <style>
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #f0f0f0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
+        .carousel-container {
+            width: 80%;
+            max-width: 800px;
+            overflow: hidden;
+            position: relative;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .slide {
+            min-width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .slide img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .slide h3 {
+            margin: 10px 0;
+            color: #333;
+        }
+        .slide p {
+            color: #666;
+            max-width: 600px;
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+        }
+        .prev-btn {
+            left: 10px;
+        }
+        .next-btn {
+            right: 10px;
+        }
+   
         .app-container {
             max-width: 800px;
             margin: 0 auto;
@@ -21,8 +79,26 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        img {
+	header {
+    	padding: 20px;
+    	background: rgba(0, 0, 0, 0.7);
+    	box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+	}
+        footer {
+           background: rgba(0, 0, 0, 0.5);
+           padding: 10px;
+           position: fixed;
+           width: 100%;
+           bottom: 0;
+        }
+        Video {
             max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        img {
+            max-width: 70%;
             height: auto;
             border-radius: 10px;
         }
@@ -32,16 +108,69 @@
         }
     </style>
 </head>
-<body>
-    <div class="app-container">
-        <h1>ME Robot</h1>
-         <video controls>
-    <source src="Tok_Browser_Ad_SD_480p.mov" type="video/quicktime">
-    loading...
-  
-        <img src="merobot.png" alt="connect to Me Robot">
-             </video>
-        <p>email: janicechang.taiwan@gmail.com</p>
+
+<section>
+ 	
+</section>
+
+<h1>ME ROBOT .NET</h1>
+    <div class="carousel-container">
+        <div class="carousel">
+            <div class="slide">
+                <video controls>
+    		<source src="Tok_Browser_Ad_SD_480p.mp4" type="video/mp4">
+    		loading...
+             	</video>
+                <h3>Tok Browser</h3>
+                <p>An iOS App. Read the webpage aloud</p>
+            </div>
+            <div class="slide">
+                <div class="app-container">
+		<img src="merobot.png" alt="connect to Me Robot">
+                </div>
+                
+            </div>
+            <div class="slide">
+                <img src="image_crap01.jpg" alt="Adventure">
+                <h3>Small Ball Adventure</h3>
+                <p>An Adventure of A litte Crap</p>
+            </div>
+        </div>
+        <button class="carousel-btn prev-btn">❮</button>
+        <button class="carousel-btn next-btn">❯</button>
     </div>
+
+    <script>
+        const carousel = document.querySelector('.carousel');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        let currentIndex = 0;
+
+        function updateCarousel() {
+            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateCarousel();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            updateCarousel();
+        });
+
+        // 自動播放
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateCarousel();
+        }, 100000);
+    </script>
+
+<footer>
+<h5>ME Robot .net</h5>
+<h5>email: janicechang.taiwan@gmail.com</h5>
+</footer>
 </body>
 </html>
