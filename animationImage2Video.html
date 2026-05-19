@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動態背景生成器</title>
+    <style>
+        /* === 全域與佈局設定 === */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 主要控制面板區域 */
+        #controls {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* 控制項風格 */
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 0;
+        }
+        
+        .input-area, .select-area {
+            flex: 1;
+        }
+
+        /* 底圖預覽區域 */
+        #previewContainer {
+            position: relative;
+            width: 800px; /* 固定寬度作為展示標準 */
+            height: 500px; /* 固定高度作為展示標準 */
+            background-color: #ccc;
+            border: 3px solid #aaa;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden; /* 確保特效不會溢出預覽框 */
+        }
+
+        /* 底圖 (Base Image) */
+        #backgroundImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover; /* 確保圖片覆蓋整個區域 */
+            background-position: center;
+        }
+
+        /* 所有特效動畫的共同容器 (疊加層) */
+        #overlayContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 讓底下的點擊事件能順利傳遞（如果需要） */
+        }
+
+        /* ======================= */
+        /* ====== ✨ 發光粒子動畫 ======= */
+        /* ======================= */
+        .particles-container {
+            z-index: 11;
+        }
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 0, 0.8); /* 黃色發光 */
+            border-radius: 50%;
+            opacity: 0;
+            /* !!! 關鍵提升：添加 box-shadow 來創造發光的「暈影」效果 !!! */
+            box-shadow: 0 0 8px rgba(255, 255, 150, 0.9), /* 主光暈 */
+                        inset 0 -3px 3px rgba(255, 255, 255, 0.6); /* 內射的白色高光，增加立體感 */
+            animation: floatParticles linear infinite;
+        }
+
+        @keyframes floatParticles {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(calc(-50vw + var(--start-x)), calc(100vh + 20px)); /* 飄出屏幕 */
+                opacity: 0;
+            }
+        }
+/* ======================= */
+/* ====== 升級版的粒子動畫關鍵幀 ======= */
+/* ======================= */
+@keyframes floatEnhanceParticles {
+    /* from: 起點 - 從一個稍微更淡、小一點的狀態開始，模擬剛生成。*/
+    0% {
+        transform: translate(0, 0) scale(0.8); /* 小一點，從原位出現 */
+        opacity: 0; /* 完全透明，讓光暈慢慢浮現 */
+        box-shadow: 0 0 2px rgba(255, 255, 150, 0.4), inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+    }
+    /* 20%: 上升/達到最佳亮度點。 */
+    20% {
+        transform: translate(calc(-50vw + var(--start-x)), calc(-10vh + var(--y-offset))) scale(1.2); /* 定義了一個更複雜的浮動軌跡 */
+        opacity: 0.9; /* 亮度達到最高 */
+        box-shadow: 0 0 15px rgba(255, 255, 150, 1), inset 0 -3px 3px rgba(255, 255, 255, 0.8);
+    }
+    /* 80%: 下降與衰減 - 開始逐漸變小、透明，模擬能量耗盡。*/
+    80% {
+        transform: translate(calc(-50vw + var(--start-x)), calc(120vh + var(--y-offset))) scale(0.7);
+        opacity: 0.6; /* 透明度降低 */
+        box-shadow: 0 0 8px rgba(255, 255, 150, 0.5), inset 0 -3px 3px rgba(255, 255, 255, 0.4);
+    }
+    /* 100%: 完全消失 */
+    100% {
+        transform: translate(calc(-50vw + var(--start-x)), calc(130vh + var(--y-offset))) scale(0.5);
+        opacity: 0; /* 徹底隱形 */
+        box-shadow: none;
+    }
+}
+        /* ======================= */
+        /* ====== 💧 雨滴動畫 ======= */
+        /* ======================= */
+        .rain {
+            position: absolute;
+            width: 2px;
+            height: 30px;
+            background-color: rgba(90, 117, 191, 0.6); /* 粉紅色 */
+            border-radius: 60% 60% 40% 40% / 35% 35% 15% 15%; /* 模擬形狀 */
+            opacity: 0;
+            animation: dropRain linear infinite;
+        }
+
+        @keyframes dropRain {
+           0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(0, calc(100vh*10 + 20px)) scale(3); /* 飄出屏幕 */
+                opacity: 0;
+            }
+        }
+
+        
+
+        /* ======================= */
+        /* ====== 🌸 花瓣動畫 ======= */
+        /* ======================= */
+        .petal {
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            background-color: rgba(255, 182, 193, 0.6); /* 粉紅色 */
+            border-radius: 50% / 60% 40% 60% 40%; /* 模擬花瓣形狀 */
+            opacity: 0;
+            animation: floatParticles linear infinite;
+        }
+
+        @keyframes fallPetals {
+            0% {
+                transform: translate(var(--start-x), -10%);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translate(calc(var(--end-x) + var(--drift)), 105%); /* 飄落並帶一點橫移 */
+                opacity: 0;
+            }
+        }
+        /* --- 按鈕樣式 --- */
+        button, .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        #uploadButton {
+            background-color: #4CAF50;
+            color: white;
+            margin-bottom: 20px;
+        }
+        #uploadButton:hover {
+            background-color: #45a049;
+        }
+        
+        /* 最終輸出按鈕 */
+        #captureVideoBtn {
+            background-color: #FF5722;
+            color: white;
+            padding: 15px 35px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        #captureVideoBtn:hover {
+            background-color: #e64a19;
+        }
+
+        /* --- 特效動畫的通用樣式 (這些類名將由JS動態添加) --- */
+        .effect-particle, .effect-light, .effect-raindrop, 
+        .effect-bubble, .effect-square, .effect-hexagon {
+            position: absolute;
+            /* 動態定位和動畫屬性將在JS中設置 */
+            pointer-events: none; 
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <h2>🎬 背景素材與效果設定</h2>
+
+        <!-- 1. 底圖選擇 -->
+        <h3>底圖 (Base Image)</h3>
+        <div class="control-group">
+            <button id="uploadButton">📂 點選上傳圖片作為底圖</button>
+            <input type="file" id="imageLoader" accept="image/*" >
+        </div>
+
+        <!-- 2. 特效動畫選擇 -->
+        <h3>疊加特效 (Select Effect)</h3>
+        <div class="control-group">
+            <label for="effectSelector" style="flex-basis: 150px; font-weight: bold;">選擇效果:</label>
+            <select id="effectSelector" onchange="applyEffect(this.value)" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
+                <option value="" selected disabled>-- 請選擇一個動畫特效 --</option>
+                <option value="particle">✨ 發光粒子 (Particle)</option>
+                <option value="light">💡 光點 (Light Spot)</option>
+                <option value="raindrop">💧 雨滴 (Raindrop)</option>
+                
+            </select>
+        </div>
+    </div>
+
+    <!-- 視覺化預覽區 -->
+    <h2>🖼️ 即時預覽</h2>
+    <div id="previewContainer">
+        <!-- 底圖層，由JS填充圖片URL -->
+        <div id="backgroundImage"></div>
+        <!-- 所有特效動畫都疊加在這個容器裡 -->
+        <div id="overlayContainer">
+            <!-- 特效元素將被添加到此處 -->
+        </div>
+    </div>
+
+    
+    <!-- 最終輸出按鈕 -->
+    <button id="captureVideoBtn">▶️ 將畫面儲存為 VIDEO</button>
+
+
+    <script>
+        // ============================================
+        // JS DOM Elements & State Management
+        // ============================================
+        const imageLoader = document.getElementById('imageLoader');
+        const uploadButton = document.getElementById('uploadButton');
+        const backgroundImageEl = document.getElementById('backgroundImage');
+        const overlayContainer = document.getElementById('overlayContainer');
+        const effectSelector = document.getElementById('effectSelector');
+        const captureVideoBtn = document.getElementById('captureVideoBtn');
+       
+        let currentBackgroundImageUrl = null;
+        let activeEffectClass = ''; // 用於追蹤當前激活的特效類別名
+
+        // ------------------------------------------------------------
+        // === 1. 底圖上傳邏輯 (Image Handling) ===
+        // ------------------------------------------------------------
+        uploadButton.addEventListener('click', () => {
+            imageLoader.click(); // 觸發隱藏的文件選擇器
+        });
+
+        imageLoader.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                       
+                    };
+                img.src = e.target.result;
+                    currentBackgroundImageUrl = event.target.result;
+                    backgroundImageEl.style.backgroundImage = `url('${currentBackgroundImageUrl}')`;
+                    // 載入圖片後，重置特效層，確保畫面乾淨
+                    //resetEffects(); 
+                    resetAnimations();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    
+        // ------------------------------------------------------------
+        // === 2. 特效動畫控制邏輯 (Effect Handling) ===
+        // ------------------------------------------------------------
+
+        // 2. 動畫控制和清理功能
+        /** 清除 #animation-overlay 中的所有內容和類別 */
+        function resetAnimations() {
+            overlayContainer.innerHTML = ''; // 清空所有DOM元素
+            overlayContainer.className = 'overlayContainer'; // 重置CSS class列表
+        }
+
+        // 3. 動畫應用核心邏輯 (由 onchange 事件觸發)
+        function applyEffect(effect) {
+            resetAnimations(); // 先清除舊動畫
+            
+            if (!effect || effect === 'none') {
+                return;
+            }
+
+            console.log(`Applying effect: ${effect}`);
+
+            switch (effect) {
+                case 'raindrop':
+                    addRainAnimation();
+                    break;
+                case 'particle':
+                    addParticleAnimation();
+                    break;
+                case 'light':
+                    addPetalAnimation();
+                    break;
+            }
+        }
+
+
+        // =======================
+        // ======== 動畫實現細節 (JavaScript) =======
+        // =======================
+
+        /** 實作雨滴動畫 */
+        function addRainAnimation() {
+             const petalCount = 50; // 生成 30 片花瓣
+             for (let i = 0; i < petalCount; i++) {
+                const rain = document.createElement('div');
+                rain.classList.add('rain');
+
+                // 設定隨機的起始位置和飄落偏移量，模擬雨滴從空中掉落的軌跡
+                const startX = `${Math.random() * 100}px`; // 將開始位置設置為像素值，更符合實際座標。
+                const dropOffset = (Math.random() ) * 20; // 計算一個在 -10 到 +10 之間隨機的水平偏移量（用於模擬風吹或水流）。
+
+                // 使用 CSS Custom Properties：將 JS 的動態計算結果，注入到元素的 Style 中。
+                rain.style.setProperty('--start-x', startX);      // 將起始位置 X (px) 設置為自定義屬性。
+                rain.style.setProperty('--drop', `${dropOffset}px`); // 將隨機偏移量設置為自定義屬性 `--drop`。
+
+                // 動畫時間和延遲（這部分保持不變）
+                rain.style.animationDuration = `${3 + Math.random() * 5}s`; // 持續時間 8-13秒
+                rain.style.animationDelay = `${Math.random() * 0.5}s`;
+
+                // 定位和啟動點（這部分保持不變）
+                rain.style.left = `${Math.random() * 1100}px`; // 初始水平位置
+                rain.style.top = `-10%`;                     // 從屏幕上方開始掉落
+
+                overlayContainer.appendChild(rain);
+            }
+            // 注意：由於 CSS 中的 'fallRain' 是循環動畫，只需一次加入 class 即可實現持續效果。
+        }
+
+
+        /** 實作粒子發光動畫 */
+        function addParticleAnimation() {
+            const particleCount = 40; // 生成 40 個粒子
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+
+                // 給予隨機初始位置和動畫參數，以確保每次運行都是不同的
+                particle.style.setProperty('--start-x', `${Math.random() * 100}%`);
+                particle.style.left = `${Math.random() * 900*2}px`; // 根據容器寬度設置 (這裡假設容器約為 900px)
+                particle.style.top = `${Math.random() * 500*2}px`;
+                particle.style.animationDuration = `${2 + Math.random() * 3}s`; // 持續時間 2-5秒
+                particle.style.animationDelay = `${Math.random() * 1}s`;
+                particle.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(1)`;
+
+                overlayContainer.appendChild(particle);
+            }
+        }
+
+        /** 實作花瓣飄落動畫 */
+        function addPetalAnimation() {
+            const petalCount = 40; // 生成 30 片花瓣
+             for (let i = 0; i < petalCount; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+
+                // 設定隨機的起始和終點，模擬飄落軌跡
+                const startX = `${Math.random() * 900*2}px`;//`${Math.random() * 100}%`;
+                const endX = `${Math.random() * 950*2}px`; // 假設最大寬度
+                const driftAmount = (Math.random() - 0.5) * 20; // 水平飄移範圍 (-10到+10)
+
+                petal.style.setProperty('--start-x', startX);
+                petal.style.setProperty('--end-x', endX);
+                petal.style.setProperty('--drift', `${driftAmount}px`);
+                petal.style.animationDuration = `${6 + Math.random() * 5}s`; // 持續時間 8-13秒
+                petal.style.animationDelay = `${Math.random() * 0.5}s`;
+                petal.style.left = `${Math.random() * 900}px`;
+                petal.style.top = `${Math.random() * 500*2}px`;//`-2%`; // 從屏幕上方開始
+                
+                overlayContainer.appendChild(petal);
+            }
+        }
+        /** 重設特效層，移除所有已存在的動態元素 */
+        function resetEffects() {
+            overlayContainer.innerHTML = '';
+            activeEffectClass = '';
+        }
+
+       
+
+    </script>
+</body>
+</html>
